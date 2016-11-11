@@ -19,13 +19,13 @@ from markdown.extensions import Extension
 def create_cell_div(parent, content, width):
     cell = etree.SubElement(parent, "div")
     # cell.set('style', "flex:{}".format(width))
-    cell.set('class', 'mk-col-sm-{}'.format(width))
+    cell.set('class', 'col-sm-{}'.format(width))
     cell.text = content
 
 
 def create_container(parent):
     container = etree.SubElement(parent, "div")
-    container.set('class', 'mk-container')
+    container.set('class', 'container')
     return container
 
 
@@ -62,7 +62,7 @@ class FlexBoxColumns(BlockProcessor):
     def process_rows(self, parent):
         for row in self.rows:
             fl = etree.SubElement(parent, "div")
-            fl.set('class', 'mk-row {}'.format(self.table_class))
+            fl.set('class', 'row {}'.format(self.table_class))
 
             zp = zip(*(self.process_row(rw) for rw in row['row']))
             lst = list(zp)
