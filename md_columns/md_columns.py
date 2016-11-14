@@ -74,6 +74,7 @@ class FlexBoxColumns(BlockProcessor):
 
     def run(self, parent, blocks):
         raw_block = blocks.pop(0)
+        raw_block=raw_block.lstrip()
         # parent = create_container(parent)
         lines = raw_block.split('\n')
         self._run(lines)

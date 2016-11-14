@@ -80,6 +80,10 @@ def get_doc1():
         cols = fl.read()
     return cols
 
+def get_doc2():
+    with open("test2_columns.md", 'r')as fl:
+        cols = fl.read()
+    return cols
 
 doc_output = """<div class="row instruction">
 <div class="col-sm-7">
@@ -188,3 +192,8 @@ def test_block4():
     txt = md.convert(get_doc1())
     print(txt)
     assert txt==doc1_output
+
+def test_block5():
+    txt=md.convert(get_doc2())
+    print(txt)
+    assert True
