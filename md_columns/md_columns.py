@@ -16,11 +16,6 @@ import re
 from markdown.extensions import Extension
 
 
-def create_cell_div(parent, content, width):
-    cell = etree.SubElement(parent, "div")
-    # cell.set('style', "flex:{}".format(width))
-    cell.set('class', 'col-sm-{}'.format(width))
-    cell.text = content
 
 
 def create_container(parent):
@@ -67,8 +62,15 @@ class FlexBoxColumns(BlockProcessor):
             zp = zip(*(self.process_row(rw) for rw in row['row']))
             lst = list(zp)
             for cell, width in zip(lst, row['widths']):
-                cell = "<br>".join((cl for cl in cell if cl))
-                create_cell_div(fl, cell, width)
+                #cell = "<br>".join((cl for cl in cell if cl))
+                cell = [cl for cl in cell if cl]
+                self.create_cell_div(fl, cell, width)
+
+    def create_cell_div(self, parent, content, width):
+        cell = etree.SubElement(parent, "div")
+        # cell.set('style', "flex:{}".format(width))
+        cell.set('class', 'col-sm-{}'.format(width))
+        self.parser.parseBlocks(cell, content)
 
     def run(self, parent, blocks):
         raw_block = blocks.pop(0)
@@ -102,7 +104,7 @@ class DefFlexBloxColumnsExtension(Extension):
         """ Add an instance of DefListProcessor to BlockParser. """
         md.parser.blockprocessors.add('defflexcolumn',
                                       FlexBoxColumns(md.parser),
-                                      '>indent')
+                                      '_begin')
 
 
 def makeExtension(*args, **kwargs):
