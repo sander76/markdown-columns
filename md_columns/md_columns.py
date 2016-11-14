@@ -58,7 +58,6 @@ class FlexBoxColumns(BlockProcessor):
         for row in self.rows:
             fl = etree.SubElement(parent, "div")
             fl.set('class', 'row {}'.format(self.table_class))
-
             zp = zip(*(self.process_row(rw) for rw in row['row']))
             lst = list(zp)
             for cell, width in zip(lst, row['widths']):
@@ -93,8 +92,8 @@ class FlexBoxColumns(BlockProcessor):
             self.table_class = m.group(2)
 
     def process_row(self, line):
-        line = line.strip('| ')
-        columns = (ln.strip(' +') for ln in line.split('|'))
+        #line = line.strip('| ')
+        columns = [ln.strip(' +') for ln in line.split('|')][1:-1]
         return columns
 
 
