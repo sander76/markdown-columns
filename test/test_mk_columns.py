@@ -22,7 +22,8 @@ input2 = """%% %1 %2 %9 another instruction
 | ---------------- | ---- | ------- |
 | test             | test | testing |"""
 
-output2 = """<div class="row another instruction">
+output2 = """<div class="another instruction">
+<div class="row">
 <div class="col-sm-1">
 <p>test</p>
 </div>
@@ -31,6 +32,7 @@ output2 = """<div class="row another instruction">
 </div>
 <div class="col-sm-9">
 <p>testing</p>
+</div>
 </div>
 </div>"""
 

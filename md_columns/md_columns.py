@@ -69,13 +69,13 @@ class FlexBoxColumns(BlockProcessor):
 
     def run(self, parent, blocks):
         parent = etree.SubElement(parent, "div")
-        parent.set('class', self.table_class)
         raw_block = blocks.pop(0)
         raw_block = raw_block.lstrip()
         # parent = create_container(parent)
         lines = raw_block.split('\n')
         self._run(lines)
         self.process_rows(parent)
+        parent.set('class', self.table_class)
         self.set_defaults()
 
     def get_col_widths(self, line):
