@@ -68,6 +68,20 @@ output3 = """<div class="row instruction">
 
 md = markdown.Markdown(extensions=['md_columns.md_columns', 'three_columns', 'markdown.extensions.def_list'])
 
+md1=markdown.Markdown(extensions=['md_columns.md_columns','markdown.extensions.tables','markdown.extensions.attr_list'])
+
+input4="""|   |   |
+| ---- | ---- |
+| test{: .admonition} | test |
+
+%% %3 %3
+| ---- | ---- |
+| _test_ | test |
+| ++ test{: .admonition} | test |"""
+
+input5="""%% %3 %3
+| ---- | ---- |
+| a test{: .admonition} a | test |"""
 
 def get_doc():
     with open("test_columns.md", 'r') as fl:
@@ -195,5 +209,15 @@ def test_block4():
 
 def test_block5():
     txt=md.convert(get_doc2())
+    print(txt)
+    assert True
+
+def test_block6():
+    txt=md1.convert(input4)
+    print(txt)
+    assert True
+
+def test_block7():
+    txt=md1.convert(input5)
     print(txt)
     assert True

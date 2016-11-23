@@ -16,8 +16,6 @@ import re
 from markdown.extensions import Extension
 
 
-
-
 def create_container(parent):
     container = etree.SubElement(parent, "div")
     container.set('class', 'container')
@@ -57,23 +55,23 @@ class FlexBoxColumns(BlockProcessor):
     def process_rows(self, parent):
         for row in self.rows:
             fl = etree.SubElement(parent, "div")
-            fl.set('class', 'row {}'.format(self.table_class))
+            fl.set('class', 'row')
             zp = zip(*(self.process_row(rw) for rw in row['row']))
             lst = list(zp)
             for cell, width in zip(lst, row['widths']):
-                #cell = "<br>".join((cl for cl in cell if cl))
                 cell = [cl for cl in cell if cl]
                 self.create_cell_div(fl, cell, width)
 
     def create_cell_div(self, parent, content, width):
         cell = etree.SubElement(parent, "div")
-        # cell.set('style', "flex:{}".format(width))
         cell.set('class', 'col-sm-{}'.format(width))
         self.parser.parseBlocks(cell, content)
 
     def run(self, parent, blocks):
+        parent = etree.SubElement(parent, "div")
+        parent.set('class', self.table_class)
         raw_block = blocks.pop(0)
-        raw_block=raw_block.lstrip()
+        raw_block = raw_block.lstrip()
         # parent = create_container(parent)
         lines = raw_block.split('\n')
         self._run(lines)
@@ -92,7 +90,7 @@ class FlexBoxColumns(BlockProcessor):
             self.table_class = m.group(2)
 
     def process_row(self, line):
-        #line = line.strip('| ')
+        # line = line.strip('| ')
         columns = [ln.strip(' +') for ln in line.split('|')][1:-1]
         return columns
 
