@@ -124,3 +124,17 @@ doc_output = """<div class="instruction">
 <div class="col-sm-5"></div>
 </div>
 </div>"""
+
+output8 = """<div class="instruction">
+<div class="row2">
+<div class="col-sm-1 cell">
+<p>test</p>
+</div>
+<div class="col-sm-2 cell">
+<p>test</p>
+</div>
+<div class="col-sm-9 cell">
+<p>testing</p>
+</div>
+</div>
+</div>"""

@@ -16,18 +16,22 @@ import re
 from markdown.extensions import Extension
 
 
-def create_container(parent):
-    container = etree.SubElement(parent, "div")
-    container.set('class', 'container')
-    return container
+# def create_container(parent):
+#     container = etree.SubElement(parent, "div")
+#     container.set('class', 'container')
+#     return container
 
 
 class FlexBoxColumns(BlockProcessor):
     """ Process Definition Lists. """
 
-    def __init__(self, parser):
+    def __init__(self, parser, config):
         BlockProcessor.__init__(self, parser)
         self.set_defaults()
+
+        self.row_class = config['row_class']
+        self.cell_width_template = config["cell_width_class_template"]
+        #self.instruction_class = config["instruction_class"]
 
     RE = re.compile(r'%%([\s%\d{1,2}]+)(.*)')
 
@@ -55,7 +59,7 @@ class FlexBoxColumns(BlockProcessor):
     def process_rows(self, parent):
         for row in self.rows:
             fl = etree.SubElement(parent, "div")
-            fl.set('class', 'row')
+            fl.set('class', self.row_class)
             zp = zip(*(self.process_row(rw) for rw in row['row']))
             lst = list(zp)
             for cell, width in zip(lst, row['widths']):
@@ -64,7 +68,7 @@ class FlexBoxColumns(BlockProcessor):
 
     def create_cell_div(self, parent, content, width):
         cell = etree.SubElement(parent, "div")
-        cell.set('class', 'col-sm-{}'.format(width))
+        cell.set('class', self.cell_width_template.format(width))
         self.parser.parseBlocks(cell, content)
 
     def run(self, parent, blocks):
@@ -96,12 +100,20 @@ class FlexBoxColumns(BlockProcessor):
 
 
 class DefFlexBloxColumnsExtension(Extension):
-    """ Add definition lists to Markdown. """
+    def __init__(self, *args, **kwargs):
+        self.config = {
+            'row_class': ['row',
+                          'the class name of the container'],
+            'cell_width_class_template': ['col-sm-{}',
+                                          'the template to set the cell width']}
+            # 'instruction_class': ['instruction',
+            #                       'all rows get wrapped inside an instruction div']}
+        super(DefFlexBloxColumnsExtension, self).__init__(*args, **kwargs)
 
     def extendMarkdown(self, md, md_globals):
         """ Add an instance of DefListProcessor to BlockParser. """
         md.parser.blockprocessors.add('defflexcolumn',
-                                      FlexBoxColumns(md.parser),
+                                      FlexBoxColumns(md.parser, self.getConfigs()),
                                       '_begin')
 
 
