@@ -54,6 +54,47 @@ output3 = """<div class="instruction">
 </div>
 </div>"""
 
+output6 = """<div class="instruction">
+<div class="row">
+<div class="col-sm-1">
+<p>cell 1 <strong>cell 1 line 2</strong></p>
+</div>
+<div class="col-sm-2">
+<p>test</p>
+</div>
+<div class="col-sm-10">
+<p>testing</p>
+</div>
+</div>
+<div class="row">
+<div class="col-sm-1">
+<p>cell 2</p>
+</div>
+<div class="col-sm-2">
+<p>test</p>
+</div>
+<div class="col-sm-10">
+<p>testing</p>
+</div>
+</div>
+</div>"""
+
+output7 = """<div class="instruction">
+<div class="row">
+<div class="col-sm-1">
+<p>cell 1</p>
+<p><strong>row1</strong> row1 attached</p>
+</div>
+<div class="col-sm-2">
+<p>test</p>
+</div>
+<div class="col-sm-10">
+<p>testing</p>
+</div>
+</div>
+</div>"""
+
+
 doc_output = """<div class="instruction">
 <div class="row">
 <div class="col-sm-7">

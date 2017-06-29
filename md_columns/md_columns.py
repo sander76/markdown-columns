@@ -16,12 +16,6 @@ import re
 from markdown.extensions import Extension
 
 
-# def create_container(parent):
-#     container = etree.SubElement(parent, "div")
-#     container.set('class', 'container')
-#     return container
-
-
 class FlexBoxColumns(BlockProcessor):
     """ Process Definition Lists. """
 
@@ -31,7 +25,7 @@ class FlexBoxColumns(BlockProcessor):
 
         self.row_class = config['row_class']
         self.cell_width_template = config["cell_width_class_template"]
-        #self.instruction_class = config["instruction_class"]
+        # self.instruction_class = config["instruction_class"]
 
     RE = re.compile(r'%%([\s%\d{1,2}]+)(.*)')
 
@@ -43,28 +37,38 @@ class FlexBoxColumns(BlockProcessor):
         self.widths = None
 
     def _run(self, lines):
-        self.rows = []
-        row = []
+        self.tables = []
+
         for ln in lines:
             if ln.startswith("%%"):
                 self.get_col_widths(ln)
             elif ln.startswith('| -') or ln.startswith('|-'):
                 pass
+
             elif ln.startswith('| ++') or ln.startswith('|++'):
-                row['row'].append(ln)
+                _col = self.get_columns(ln)
+                table['rows'].append(_col)
+            elif ln.startswith('| +=') or ln.startswith('|+='):
+                _col = self.get_columns(ln)
+                FlexBoxColumns._merge_rows(table.get('rows')[-1], _col)
             else:
-                row = {'row': [ln], 'widths': self.widths}
-                self.rows.append(row)
+                _col = self.get_columns(ln)
+                table = {'rows': [_col], 'widths': self.widths}
+                self.tables.append(table)
+
+    @staticmethod
+    def _merge_rows(row1, row2):
+        for idx, cols in enumerate(zip(row1, row2)):
+            row1[idx] = (' '.join(cols)).strip()
 
     def process_rows(self, parent):
-        for row in self.rows:
+        for table in self.tables:
             fl = etree.SubElement(parent, "div")
             fl.set('class', self.row_class)
-            zp = zip(*(self.process_row(rw) for rw in row['row']))
-            lst = list(zp)
-            for cell, width in zip(lst, row['widths']):
-                cell = [cl for cl in cell if cl]
-                self.create_cell_div(fl, cell, width)
+            # for row in table['rows']:
+            for cell, width in zip(zip(*table['rows']), table['widths']):
+                # cell = [cl for cl in cell if cl]
+                self.create_cell_div(fl, list(cell), width)
 
     def create_cell_div(self, parent, content, width):
         cell = etree.SubElement(parent, "div")
@@ -93,9 +97,8 @@ class FlexBoxColumns(BlockProcessor):
         else:
             self.table_class = m.group(2)
 
-    def process_row(self, line):
-        # line = line.strip('| ')
-        columns = [ln.strip(' +') for ln in line.split('|')][1:-1]
+    def get_columns(self, line):
+        columns = [ln.strip(' +=') for ln in line.split('|')][1:-1]
         return columns
 
 
@@ -106,14 +109,14 @@ class DefFlexBloxColumnsExtension(Extension):
                           'the class name of the container'],
             'cell_width_class_template': ['col-sm-{}',
                                           'the template to set the cell width']}
-            # 'instruction_class': ['instruction',
-            #                       'all rows get wrapped inside an instruction div']}
+
         super(DefFlexBloxColumnsExtension, self).__init__(*args, **kwargs)
 
     def extendMarkdown(self, md, md_globals):
         """ Add an instance of DefListProcessor to BlockParser. """
         md.parser.blockprocessors.add('defflexcolumn',
-                                      FlexBoxColumns(md.parser, self.getConfigs()),
+                                      FlexBoxColumns(md.parser,
+                                                     self.getConfigs()),
                                       '_begin')
 
 

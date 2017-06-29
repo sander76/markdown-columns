@@ -1,11 +1,14 @@
 import markdown
 
 from md_columns import md_columns
-from test.output import output1, output2, output3, output8, doc_output
+from test.output import output1, output2, output3, output8, doc_output, \
+    output6, output7
 
-input1 = """%% %1 %2 %9
+input1 = """
+%% %1 %2 %9
 | ---------------- | ---- | ------- |
-| test             | test | testing |"""
+| test             | test | testing |
+"""
 
 input2 = """%% %1 %2 %9 another
 | ---------------- | ---- | ------- |
@@ -17,10 +20,12 @@ input3 = """%% %1 %2 %10
 | ++ **cell 1 line 2**   | test | testing |
 | cell 2 | test | testing |"""
 
-md = markdown.Markdown(extensions=['md_columns.md_columns', 'three_columns', 'markdown.extensions.def_list'])
+md = markdown.Markdown(
+    extensions=['md_columns.md_columns', 'markdown.extensions.def_list'])
 
 md1 = markdown.Markdown(
-    extensions=['md_columns.md_columns', 'markdown.extensions.tables', 'markdown.extensions.attr_list'])
+    extensions=['md_columns.md_columns', 'markdown.extensions.tables',
+                'markdown.extensions.attr_list'])
 
 input4 = """|   |   |
 | ---- | ---- |
@@ -34,6 +39,18 @@ input4 = """|   |   |
 input5 = """%% %3 %3
 | ---- | ---- |
 | a test{: .admonition} a | test |"""
+
+input6="""%% %1 %2 %10
+| ---------------- | ---- | ------- |
+| cell 1             | test | testing |
+| += **cell 1 line 2**   |  |  |
+| cell 2 | test | testing |"""
+
+input7="""%% %1 %2 %10
+| ---------------- | ---- | ------- |
+| cell 1             | test | testing |
+| ++ **row1**   |  |  |
+| += row1 attached |  |  |"""
 
 
 def get_doc():
@@ -52,8 +69,6 @@ def get_doc2():
     with open("test2_columns.md", 'r')as fl:
         cols = fl.read()
     return cols
-
-
 
 
 doc1_output = """<blockquote>
@@ -108,10 +123,16 @@ def test_block5():
     assert True
 
 
-# def test_block6():
-#     txt = md1.convert(input4)
-#     print(txt)
-#     assert False
+def test_block6():
+    txt = md1.convert(input6)
+    print(txt)
+    assert txt == output6
+
+
+def test_block7():
+    txt = md1.convert(input7)
+    print(txt)
+    assert txt == output7
 #
 #
 # def test_block7():
@@ -124,8 +145,11 @@ def test_block5():
 input8 = """%% %1 %2 %9
 | ---------------- | ---- | ------- |
 | test             | test | testing |"""
+
+
 def test_block8():
-    ext = md_columns.DefFlexBloxColumnsExtension(row_class='row2',cell_width_class_template='col-sm-{} cell')
+    ext = md_columns.DefFlexBloxColumnsExtension(row_class='row2',
+                                                 cell_width_class_template='col-sm-{} cell')
     md2 = markdown.Markdown(extensions=[ext])
     txt = md2.convert(input8)
     assert txt == output8
