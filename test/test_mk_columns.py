@@ -1,27 +1,24 @@
 import markdown
+import pytest
 
-from md_columns import md_columns
-from test.output import output1, output2, output3, output8, doc_output, \
+from md_columns.md_columns import CssColumnsExtension
+
+from test.output import output2, output3, output8, doc_output, \
     output6, output7
-
-input1 = """
-%% %1 %2 %9
-| ---------------- | ---- | ------- |
-| test             | test | testing |
-"""
 
 input2 = """%% %1 %2 %9 another
 | ---------------- | ---- | ------- |
 | test             | test | testing |"""
 
-input3 = """%% %1 %2 %10
-| ---------------- | ---- | ------- |
-| cell 1             | test | testing |
+input3 = """
+%% %1 %2 %10
+| ---------------------- | ---- | ------- |
+| cell 1                 | test | testing |
 | ++ **cell 1 line 2**   | test | testing |
-| cell 2 | test | testing |"""
+| cell 2                 | test | testing |"""
 
 md = markdown.Markdown(
-    extensions=['md_columns.md_columns', 'markdown.extensions.def_list'])
+    extensions=[CssColumnsExtension(), 'markdown.extensions.def_list'])
 
 md1 = markdown.Markdown(
     extensions=['md_columns.md_columns', 'markdown.extensions.tables',
@@ -40,13 +37,7 @@ input5 = """%% %3 %3
 | ---- | ---- |
 | a test{: .admonition} a | test |"""
 
-input6="""%% %1 %2 %10
-| ---------------- | ---- | ------- |
-| cell 1             | test | testing |
-| += **cell 1 line 2**   |  |  |
-| cell 2 | test | testing |"""
-
-input7="""%% %1 %2 %10
+input7 = """%% %1 %2 %10
 | ---------------- | ---- | ------- |
 | cell 1             | test | testing |
 | ++ **row1**   |  |  |
@@ -86,6 +77,72 @@ doc1_output = """<blockquote>
 </div>
 </div>"""
 
+input1 = """
+%% %1 %2 %9
+| ---------------- | ---- | ------- |
+| test             | test | testing |
+"""
+
+output1 = """<div class="instruction">
+<div class="row">
+<div class="col-sm-1">
+<p>test</p>
+</div>
+<div class="col-sm-2">
+<p>test</p>
+</div>
+<div class="col-sm-9">
+<p>testing</p>
+</div>
+</div>
+</div>"""
+
+from md_columns.md_columns import Columns, get_columns, get_class, \
+    CssColumnsExtension
+
+input1 = """
+%% %1 %2 %9
+| ---------------- | ---- | ------- |
+| test             | test | testing |
+"""
+
+single_line_tests = """
+%% %1 %2 %9
+| -------------------- | ---- | ------- |
+| testing              | adsf | asdf    |{: .test}
+| ++ adding extra line | 123  | 123     |
+"""
+
+
+def test_get_column():
+    cols = Columns(single_line_tests)
+    assert cols._lines[0].startswith('%%')
+    _cols, _css_class = get_columns(cols._lines[2])
+    assert len(_cols) == 3
+    assert get_class(_css_class) == 'test'
+    _cols, _css_class = get_columns(cols._lines[3])
+    assert len(_cols) == 3
+    assert _cols[0] == 'adding extra line'
+    assert get_class(_css_class) is None
+
+
+bucket_tests = """
+%% %1 %2 %9
+| -------------------- | ---- | ------- |
+| testing              | adsf | asdf    |
+| ++ adding extra line | 123  | 123     |
+| testing              | adsf | asdf    |
+
+| testing              | adsf | asdf    |
+
+"""
+
+
+def test_buckets():
+    cols = Columns(bucket_tests)
+    cols.run()
+    assert len(cols.tables) == 3
+
 
 def test_block():
     txt = md.convert(input1)
@@ -123,33 +180,15 @@ def test_block5():
     assert True
 
 
-def test_block6():
-    txt = md1.convert(input6)
-    print(txt)
-    assert txt == output6
-
-
-def test_block7():
-    txt = md1.convert(input7)
-    print(txt)
-    assert txt == output7
-#
-#
-# def test_block7():
-#     txt = md1.convert(input5)
-#     print(txt)
-#     assert False
-
-
-
 input8 = """%% %1 %2 %9
 | ---------------- | ---- | ------- |
 | test             | test | testing |"""
 
 
-def test_block8():
-    ext = md_columns.DefFlexBloxColumnsExtension(row_class='row2',
-                                                 cell_width_class_template='col-sm-{} cell')
+def test_class_names():
+    ext = CssColumnsExtension(
+        row_class='row2',
+        cell_width_class_template='col-{} cell')
     md2 = markdown.Markdown(extensions=[ext])
     txt = md2.convert(input8)
     assert txt == output8

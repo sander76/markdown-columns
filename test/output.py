@@ -1,16 +1,4 @@
-output1 = """<div class="instruction">
-<div class="row">
-<div class="col-sm-1">
-<p>test</p>
-</div>
-<div class="col-sm-2">
-<p>test</p>
-</div>
-<div class="col-sm-9">
-<p>testing</p>
-</div>
-</div>
-</div>"""
+
 
 output2 = """<div class="another">
 <div class="row">
@@ -168,13 +156,13 @@ doc_output = """<div class="instruction">
 
 output8 = """<div class="instruction">
 <div class="row2">
-<div class="col-sm-1 cell">
+<div class="col-1 cell">
 <p>test</p>
 </div>
-<div class="col-sm-2 cell">
+<div class="col-2 cell">
 <p>test</p>
 </div>
-<div class="col-sm-9 cell">
+<div class="col-9 cell">
 <p>testing</p>
 </div>
 </div>
