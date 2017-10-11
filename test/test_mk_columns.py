@@ -141,7 +141,7 @@ bucket_tests = """
 def test_buckets():
     cols = Columns(bucket_tests)
     cols.run()
-    assert len(cols.tables) == 3
+    assert len(cols.table_rows) == 3
 
 
 def test_block():
@@ -166,12 +166,6 @@ def test_block3():
     txt = md.convert(get_doc())
     print(txt)
     assert txt == doc_output
-
-
-# def test_block4():
-#     txt = md.convert(get_doc1())
-#     print(txt)
-#     assert txt == doc1_output
 
 
 def test_block5():

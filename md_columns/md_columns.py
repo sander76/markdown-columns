@@ -1,29 +1,14 @@
+"""Python markdown extension for adding css column layout.
 """
-
-
-%% %1 %2 %9
-| ---------------- | ---- | ------- |
-| test             | test | testing |
-| test             | test | testing |
-| dfg dsfg df test | test | testing |
-
-
-%% %1 %2 %9
-| test             | test | testing |
-| test             | test | testing |
-| dfg dsfg df test | test | testing |
-
-"""
-from markdown.util import etree
-
-from markdown.blockprocessors import BlockProcessor
 import re
 
+from markdown.util import etree
+from markdown.blockprocessors import BlockProcessor
 from markdown.extensions import Extension
 
 RE = re.compile(r'%%([\s%\d{1,2}]+)(.*)')
 
-ATTR_ROW = 'row'
+ATTR_ROW_CONTENT = 'row_content'
 ATTR_ROW_CLASS = 'css'
 
 
@@ -31,8 +16,7 @@ def get_class(css_string: str):
     if css_string is None:
         return None
     else:
-        css_string = css_string.strip('{: }')
-        css_string = css_string.replace('.', '')
+        css_string = css_string.strip('{: }').replace('.', '')
         return css_string
 
 
@@ -51,16 +35,16 @@ def get_columns(line: str):
 class Columns:
     """Columns class which populates a dict which in the end forms a table
 
-    table =
+    table_rows =
     [
-        {'row' : [['text col1','text col2','text col3'],
+        {'row_content' : [['text col1','text col2','text col3'],
                    ['text col1','text col2','text col3']
                 ]
         'widths' : [3,4,5],
         'css' : 'css class'
         },
 
-        {'row' : [['text col1','text col2','text col3'],
+        {'row_content' : [['text col1','text col2','text col3'],
                    ['text col1','text col2','text col3']
                 ]
         'widths' : [3,4,5],
@@ -78,7 +62,7 @@ class Columns:
         # lines interpretation.
         self.widths = None
         self._table_class = 'instruction'
-        self.tables = []
+        self.table_rows = []
 
     @property
     def table_class(self):
@@ -95,18 +79,15 @@ class Columns:
                 pass
             elif ln.startswith('| ++') or ln.startswith('|++'):
                 _col, _ccs_class = get_columns(ln)
-                table[ATTR_ROW].append(_col)
-            # elif ln.startswith('|+=') or ln.startswith('| +='):
-            #     _col, _css_class = get_columns(ln)
-            #     pass
+                row[ATTR_ROW_CONTENT].append(_col)
             elif ln == '':
                 pass
             else:
                 _col, _css_class = get_columns(ln)
-                table = {ATTR_ROW: [_col],
+                row = {ATTR_ROW_CONTENT: [_col],
                          'widths': self.widths,
-                         ATTR_ROW_CLASS: get_class(_css_class)}
-                self.tables.append(table)
+                       ATTR_ROW_CLASS: get_class(_css_class)}
+                self.table_rows.append(row)
 
     def _get_col_widths_and_table_class(self, line):
         m = RE.match(line)
@@ -143,13 +124,13 @@ class CssColumns(BlockProcessor):
         parent.set('class', columns.table_class)
 
     def process_rows(self, parent, columns: Columns):
-        for table in columns.tables:
+        for table in columns.table_rows:
             fl = etree.SubElement(parent, "div")
             _css_class = self.row_class
             if table[ATTR_ROW_CLASS] is not None:
                 _css_class = ' '.join((_css_class, table[ATTR_ROW_CLASS]))
             fl.set('class', _css_class)
-            for cell, width in zip(zip(*table[ATTR_ROW]), table['widths']):
+            for cell, width in zip(zip(*table[ATTR_ROW_CONTENT]), table['widths']):
                 self.create_cell_div(fl, list(cell), width)
 
     def create_cell_div(self, parent, content, width):
