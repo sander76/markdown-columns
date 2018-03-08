@@ -167,3 +167,17 @@ output8 = """<div class="instruction">
 </div>
 </div>
 </div>"""
+
+attribute_output1 = """<div class="another">
+<div class="row">
+<div class="col-sm-1">
+<p class="test1">test</p>
+</div>
+<div class="col-sm-2">
+<p>test</p>
+</div>
+<div class="col-sm-9">
+<p>testing</p>
+</div>
+</div>
+</div>"""

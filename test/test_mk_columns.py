@@ -1,10 +1,14 @@
+import logging
+
 import markdown
 import pytest
 
-from md_columns.md_columns import CssColumnsExtension
-
+from md_columns.md_columns import CssColumnsExtension, Columns, get_columns, \
+    get_class
 from test.output import output2, output3, output8, doc_output, \
-    output6, output7
+    attribute_output1
+
+logging.basicConfig(level=logging.DEBUG)
 
 input2 = """%% %1 %2 %9 another
 | ---------------- | ---- | ------- |
@@ -17,12 +21,14 @@ input3 = """
 | ++ **cell 1 line 2**   | test | testing |
 | cell 2                 | test | testing |"""
 
-md = markdown.Markdown(
-    extensions=[CssColumnsExtension(), 'markdown.extensions.def_list'])
 
-md1 = markdown.Markdown(
-    extensions=['md_columns.md_columns', 'markdown.extensions.tables',
-                'markdown.extensions.attr_list'])
+@pytest.fixture
+def parser():
+    return markdown.Markdown(
+        extensions=[CssColumnsExtension(), 'markdown.extensions.def_list'])
+
+
+
 
 input4 = """|   |   |
 | ---- | ---- |
@@ -97,9 +103,6 @@ output1 = """<div class="instruction">
 </div>
 </div>"""
 
-from md_columns.md_columns import Columns, get_columns, get_class, \
-    CssColumnsExtension
-
 input1 = """
 %% %1 %2 %9
 | ---------------- | ---- | ------- |
@@ -144,32 +147,32 @@ def test_buckets():
     assert len(cols.table_rows) == 3
 
 
-def test_block():
-    txt = md.convert(input1)
+def test_block(parser):
+    txt = parser.convert(input1)
     print(txt)
     assert txt == output1
 
 
-def test_block1():
-    txt = md.convert(input2)
+def test_block1(parser):
+    txt = parser.convert(input2)
     print(txt)
     assert txt == output2
 
 
-def test_block2():
-    txt = md.convert(input3)
+def test_block2(parser):
+    txt = parser.convert(input3)
     print(txt)
     assert txt == output3
 
 
-def test_block3():
-    txt = md.convert(get_doc())
+def test_block3(parser):
+    txt = parser.convert(get_doc())
     print(txt)
     assert txt == doc_output
 
 
-def test_block5():
-    txt = md.convert(get_doc2())
+def test_block5(parser):
+    txt = parser.convert(get_doc2())
     print(txt)
     assert True
 
@@ -186,3 +189,33 @@ def test_class_names():
     md2 = markdown.Markdown(extensions=[ext])
     txt = md2.convert(input8)
     assert txt == output8
+
+
+input_no_flow1 = """
+%% %1 %2 %9 instruction noflow
+| ---------------- | ---- | ------- |
+| test             | test | testing |
+"""
+
+output_no_flow1 = """<div class="instruction noflow">
+<div class="row">
+<div class="col-xs-1">
+<p>test</p>
+</div>
+<div class="col-xs-2">
+<p>test</p>
+</div>
+<div class="col-xs-9">
+<p>testing</p>
+</div>
+</div>
+</div>"""
+
+
+def test_no_flow(parser):
+    txt = parser.convert(input_no_flow1)
+    assert txt == output_no_flow1
+
+
+
+

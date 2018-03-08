@@ -1,10 +1,10 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='markdown-columns',
-    version='0.5.0',
+    version='0.6.0',
     packages=['md_columns'],
-    url='',
+    url='https://github.com/sander76/markdown-columns',
     license='MIT',
     author='Sander Teunissen',
     classifiers=[
@@ -14,7 +14,7 @@ setup(
         'Operating System :: OS Independent',
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'Programming Language :: Python :: > 2.73.4'],
+        'Programming Language :: Python :: 3'],
     author_email='',
     description='css columns for Python Markdown'
 )

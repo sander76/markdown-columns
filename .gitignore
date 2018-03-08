@@ -1,1 +1,7 @@
 .idea
+env
+dist
+build
+.cache
+markdown_columns.egg-info
+
