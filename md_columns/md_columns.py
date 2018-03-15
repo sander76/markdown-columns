@@ -11,7 +11,7 @@ from markdown.util import etree
 
 RE = re.compile(r'%%([\s%\d{1,2}]+)(.*)')
 
-RE_ATTR = re.compile(r'{:\s[^}]*}')
+# RE_ATTR = re.compile(r'{:\s[^}]*}')
 
 ATTR_ROW_CONTENT = 'row_content'
 ATTR_ROW_CLASS = 'css'
@@ -38,13 +38,25 @@ def get_class(css_string: str):
 
 def get_columns(line: str):
     """Splits the line into columns and checks whether there is a class
-    added."""
+    added.
+
+    :returns columns, css_class.: A list of text content making up
+        the column contents and a possible attribute list.
+    """
     _css_class = None
+    # todo: add more testing.
     if line.endswith('}'):
+        # Checks whether there is an attribute list added to the end of
+        # the row. Outside the actual table.
         _start = line.rfind('{')
         _css_class = line[_start:]
         line = line[0:_start]
-    columns = [ln.lstrip('+ ').rstrip() for ln in line.split('|')][1:-1]
+    columns = [ln.lstrip('+ =').rstrip() for ln in line.split('|')][1:-1]
+    for idx, item in enumerate(columns):
+        # todo: make this more robust.
+        _start = item.rfind('{')
+        if not _start == -1:
+            columns[idx] = '{}\n{}'.format(item[0:_start], item[_start:])
     return columns, _css_class
 
 
@@ -62,6 +74,11 @@ class Row:
 
     def add_data(self, data):
         self.rows.append(data)
+
+    def merge_content_with_previous_row(self, data):
+        _merged = zip_longest(self.rows[-1], data, fillvalue='')
+        for idx, _cell in enumerate(_merged):
+            self.rows[-1][idx] = ' '.join(_cell)
 
 
 class Columns:
@@ -119,6 +136,9 @@ class Columns:
                 self._get_col_widths_and_table_class(ln)
             elif ln.startswith('| --') or ln.startswith('|--'):
                 pass
+            elif ln.startswith('| +=' or ln.startswith('|+=')):
+                _col, _css_class = get_columns(ln)
+                row.merge_content_with_previous_row(_col)
             elif ln.startswith('| ++') or ln.startswith('|++'):
                 # append to a current row
                 LOGGER.debug("found ++")

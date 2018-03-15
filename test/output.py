@@ -67,6 +67,13 @@ output6 = """<div class="instruction">
 </div>
 </div>"""
 
+input7 = """%% %1 %2 %10
+| ---------------- | ---- | ------- |
+| cell 1           | test | testing |
+| ++ **row1**      |      |         |
+| += row1 attached |      |         |"""
+
+
 output7 = """<div class="instruction">
 <div class="row">
 <div class="col-sm-1">
@@ -171,13 +178,13 @@ output8 = """<div class="instruction">
 attribute_output1 = """<div class="another">
 <div class="row">
 <div class="col-sm-1">
-<p class="test1">test</p>
+<p class="test">test1</p>
 </div>
 <div class="col-sm-2">
-<p>test</p>
+<p>test2</p>
 </div>
 <div class="col-sm-9">
-<p>testing</p>
+<p>test3</p>
 </div>
 </div>
 </div>"""

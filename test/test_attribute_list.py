@@ -14,12 +14,9 @@ def attr_parser():
 
 attribute_list_input1 = """%% %1 %2 %9 another
 | ---------------- | ---- | ------- |
-| test1\n{: .test}          | test2 | test3 |"""
+| test1{: .test}          | test2 | test3 |"""
 
-tst = """
-test
-{: .test}
-"""
+
 
 
 def test_attribute_list(attr_parser):

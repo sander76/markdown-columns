@@ -6,7 +6,7 @@ import pytest
 from md_columns.md_columns import CssColumnsExtension, Columns, get_columns, \
     get_class
 from test.output import output2, output3, output8, doc_output, \
-    attribute_output1
+    attribute_output1, input7, output7
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -43,11 +43,6 @@ input5 = """%% %3 %3
 | ---- | ---- |
 | a test{: .admonition} a | test |"""
 
-input7 = """%% %1 %2 %10
-| ---------------- | ---- | ------- |
-| cell 1             | test | testing |
-| ++ **row1**   |  |  |
-| += row1 attached |  |  |"""
 
 
 def get_doc():
@@ -176,6 +171,9 @@ def test_block5(parser):
     print(txt)
     assert True
 
+def test_input7(parser):
+    txt = parser.convert(input7)
+    assert txt == output7
 
 input8 = """%% %1 %2 %9
 | ---------------- | ---- | ------- |

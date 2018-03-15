@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='markdown-columns',
-    version='0.6.0',
+    version='0.6.1',
     packages=['md_columns'],
     url='https://github.com/sander76/markdown-columns',
     license='MIT',
