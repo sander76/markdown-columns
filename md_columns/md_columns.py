@@ -143,7 +143,7 @@ class Columns:
                 # append to a current row
                 LOGGER.debug("found ++")
                 _col, _ccs_class = get_columns(ln)
-                LOGGER.debug(f"found {_col}")
+                LOGGER.debug("found {}".format(_col))
                 row.add_data(_col)
                 row.css = get_class(_ccs_class)
             elif ln == '':
