@@ -2,6 +2,7 @@
 """
 import logging
 import re
+import textwrap
 from itertools import zip_longest
 from typing import Sequence, List
 
@@ -9,7 +10,7 @@ from markdown.blockprocessors import BlockProcessor
 from markdown.extensions import Extension
 from markdown.util import etree
 
-RE = re.compile(r'%%([\s%\d{1,2}]+)(.*)')
+RE = re.compile(r'\A%%([\s%\d{1,2}]+)(.*)')
 
 # RE_ATTR = re.compile(r'{:\s[^}]*}')
 
@@ -204,9 +205,22 @@ class CssColumns(BlockProcessor):
         # Get the raw data block
         raw_block = blocks.pop(0)
         columns = Columns(raw_block)
-        columns.run()
-        self.process_rows(parent, columns)
-        parent.set('class', columns.table_class)
+        try:
+            columns.run()
+            self.process_rows(parent, columns)
+            parent.set('class', columns.table_class)
+        except Exception as err:
+            LOGGER.exception(err)
+            _text = textwrap.dedent(
+                """
+                <div>
+                    <div>**PROBLEM PARSING COLUMN LAYOUT**</div>
+                    {}
+                    <div>**END PROBLEM PARSING COLUMN LAYOUT**</div>
+                </div>
+                """).format(
+                    raw_block)
+            parent.text = _text
 
     def process_rows(self, parent, columns: Columns):
         for _row in columns.table_rows:

@@ -78,12 +78,6 @@ doc1_output = """<blockquote>
 </div>
 </div>"""
 
-input1 = """
-%% %1 %2 %9
-| ---------------- | ---- | ------- |
-| test             | test | testing |
-"""
-
 output1 = """<div class="instruction">
 <div class="row">
 <div class="col-sm-1">
@@ -216,4 +210,41 @@ def test_no_flow(parser):
 
 
 
+wrong_output1 = """<p>abc
+%% %1 %2 %9
+| ---------------- | ---- | ------- |
+| test             | test | testing |</p>"""
 
+wrong_input1 = """
+abc
+%% %1 %2 %9
+| ---------------- | ---- | ------- |
+| test             | test | testing |
+"""
+
+
+def test_error(parser):
+    txt = parser.convert(wrong_input1)
+    assert txt == wrong_output1
+
+
+wrong_output2 = """<div>
+<div>
+    <div><strong>PROBLEM PARSING COLUMN LAYOUT</strong></div>
+    %%
+| ---------------- | ---- | ------- |
+| test             | test | testing |
+    <div><strong>END PROBLEM PARSING COLUMN LAYOUT</strong></div>
+</div>
+</div>"""
+
+wrong_input2 = """
+%%
+| ---------------- | ---- | ------- |
+| test             | test | testing |
+"""
+
+
+def test_error1(parser):
+    txt = parser.convert(wrong_input2)
+    assert txt == wrong_output2
