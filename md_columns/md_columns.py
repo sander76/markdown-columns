@@ -9,6 +9,7 @@ from typing import Sequence, List
 from markdown.blockprocessors import BlockProcessor
 from markdown.extensions import Extension
 from markdown.util import etree
+from timeit import default_timer as timer
 
 RE = re.compile(r'\A%%([\s%\d{1,2}]+)(.*)')
 
@@ -201,6 +202,8 @@ class CssColumns(BlockProcessor):
 
     def run(self, parent, blocks):
         """main entry point for processing the block of markdown text."""
+        start = timer()
+
         parent = etree.SubElement(parent, "div")
         # Get the raw data block
         raw_block = blocks.pop(0)
@@ -221,6 +224,9 @@ class CssColumns(BlockProcessor):
                 """).format(
                     raw_block)
             parent.text = _text
+        finally:
+            end = timer()
+            LOGGER.info("finished processing markdown column in {} seconds".format(end-start))
 
     def process_rows(self, parent, columns: Columns):
         for _row in columns.table_rows:
