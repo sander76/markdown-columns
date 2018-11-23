@@ -10,6 +10,12 @@ from test.output import output2, output3, output8, doc_output, \
 
 logging.basicConfig(level=logging.DEBUG)
 
+@pytest.fixture
+def parser():
+    return markdown.Markdown(
+        extensions=[CssColumnsExtension(), 'markdown.extensions.def_list'])
+
+
 input2 = """%% %1 %2 %9 another
 | ---------------- | ---- | ------- |
 | test             | test | testing |"""
@@ -20,15 +26,6 @@ input3 = """
 | cell 1                 | test | testing |
 | ++ **cell 1 line 2**   | test | testing |
 | cell 2                 | test | testing |"""
-
-
-@pytest.fixture
-def parser():
-    return markdown.Markdown(
-        extensions=[CssColumnsExtension(), 'markdown.extensions.def_list'])
-
-
-
 
 input4 = """|   |   |
 | ---- | ---- |
@@ -78,7 +75,7 @@ doc1_output = """<blockquote>
 </div>
 </div>"""
 
-output1 = """<div class="instruction">
+output1 = """<div class="_column_container instruction">
 <div class="row">
 <div class="col-sm-1">
 <p>test</p>
@@ -184,12 +181,12 @@ def test_class_names():
 
 
 input_no_flow1 = """
-%% %1 %2 %9 instruction noflow
+%% %1 %2 %9 noflow
 | ---------------- | ---- | ------- |
 | test             | test | testing |
 """
 
-output_no_flow1 = """<div class="instruction noflow">
+output_no_flow1 = """<div class="_column_container instruction noflow">
 <div class="row">
 <div class="col-xs-1">
 <p>test</p>

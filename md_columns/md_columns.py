@@ -4,37 +4,38 @@ import logging
 import re
 import textwrap
 from itertools import zip_longest
+from timeit import default_timer as timer
 from typing import Sequence, List
 
 from markdown.blockprocessors import BlockProcessor
 from markdown.extensions import Extension
 from markdown.util import etree
-from timeit import default_timer as timer
 
-RE = re.compile(r'\A%%([\s%\d{1,2}]+)(.*)')
+RE = re.compile(r"\A%%([\s%\d{1,2}]+)(.*)")
 
 # RE_ATTR = re.compile(r'{:\s[^}]*}')
 
-ATTR_ROW_CONTENT = 'row_content'
-ATTR_ROW_CLASS = 'css'
+ATTR_ROW_CONTENT = "row_content"
+ATTR_ROW_CLASS = "css"
 
-CLASS_NO_FLOW = 'noflow'
+CLASS_NO_FLOW = "noflow"
 
-CONFIG_CELL_WIDTH_CLASS_TEMPLATE = 'cell_width_class_template'
-CONFIG_CELL_NOFLOW_WIDTH_CLASS_TEMPLATE = 'cell_noflow_width_class_template'
-DEFAULT_CELL_WIDTH_CLASS_TEMPLATE = 'col-sm-{}'
-NOFLOW_CELL_WIDTH_CLASS_TEMPLATE = 'col-xs-{}'
+CONFIG_CELL_WIDTH_CLASS_TEMPLATE = "cell_width_class_template"
+CONFIG_CELL_NOFLOW_WIDTH_CLASS_TEMPLATE = "cell_noflow_width_class_template"
+DEFAULT_CELL_WIDTH_CLASS_TEMPLATE = "col-sm-{}"
+NOFLOW_CELL_WIDTH_CLASS_TEMPLATE = "col-xs-{}"
 
 LOGGER = logging.getLogger(__name__)
 
 
 # todo: add the option to add attribute list: {: .testclass}
 
+
 def get_class(css_string: str):
     if css_string is None:
         return None
     else:
-        css_string = css_string.strip('{: }').replace('.', '')
+        css_string = css_string.strip("{: }").replace(".", "")
         return css_string
 
 
@@ -47,18 +48,18 @@ def get_columns(line: str):
     """
     _css_class = None
     # todo: add more testing.
-    if line.endswith('}'):
+    if line.endswith("}"):
         # Checks whether there is an attribute list added to the end of
         # the row. Outside the actual table.
-        _start = line.rfind('{')
+        _start = line.rfind("{")
         _css_class = line[_start:]
         line = line[0:_start]
-    columns = [ln.lstrip('+ =').rstrip() for ln in line.split('|')][1:-1]
+    columns = [ln.lstrip("+ =").rstrip() for ln in line.split("|")][1:-1]
     for idx, item in enumerate(columns):
         # todo: make this more robust.
-        _start = item.rfind('{')
+        _start = item.rfind("{")
         if not _start == -1:
-            columns[idx] = '{}\n{}'.format(item[0:_start], item[_start:])
+            columns[idx] = "{}\n{}".format(item[0:_start], item[_start:])
     return columns, _css_class
 
 
@@ -68,19 +69,19 @@ class Row:
         self.add_data(cell_data)
         self.merged_rows = None
         self.widths = cell_widths
-        self.css = ''
+        self.css = ""
 
     def merge_rows(self):
         LOGGER.debug("merging a total of {} rows".format(len(self.rows)))
-        self.merged_rows = zip_longest(*self.rows, fillvalue='')
+        self.merged_rows = zip_longest(*self.rows, fillvalue="")
 
     def add_data(self, data):
         self.rows.append(data)
 
     def merge_content_with_previous_row(self, data):
-        _merged = zip_longest(self.rows[-1], data, fillvalue='')
+        _merged = zip_longest(self.rows[-1], data, fillvalue="")
         for idx, _cell in enumerate(_merged):
-            self.rows[-1][idx] = ' '.join(_cell)
+            self.rows[-1][idx] = " ".join(_cell)
 
 
 class Columns:
@@ -111,11 +112,11 @@ class Columns:
 
     def __init__(self, raw_block):
         self.rows = []
-        self._lines = raw_block.lstrip().split('\n')
+        self._lines = raw_block.lstrip().split("\n")
         # temporary storage of column widths which are processed during the
         # lines interpretation.
         self.widths = None
-        self._table_class = 'instruction'
+        self._table_class = "_column_container instruction"
         self._table_rows = []
         # self.cell_width_template = CONFIG_CELL_WIDTH_CLASS_TEMPLATE
         # self.cell_width_template = cell_width_template
@@ -136,25 +137,26 @@ class Columns:
             ln = ln.strip()
             if ln.startswith("%%"):
                 self._get_col_widths_and_table_class(ln)
-            elif ln.startswith('| --') or ln.startswith('|--'):
+            elif ln.startswith("| --") or ln.startswith("|--"):
                 pass
-            elif ln.startswith('| +=' or ln.startswith('|+=')):
+            elif ln.startswith("| +=" or ln.startswith("|+=")):
                 _col, _css_class = get_columns(ln)
                 row.merge_content_with_previous_row(_col)
-            elif ln.startswith('| ++') or ln.startswith('|++'):
+            elif ln.startswith("| ++") or ln.startswith("|++"):
                 # append to a current row
                 LOGGER.debug("found ++")
                 _col, _ccs_class = get_columns(ln)
                 LOGGER.debug("found {}".format(_col))
                 row.add_data(_col)
                 row.css = get_class(_ccs_class)
-            elif ln == '':
+            elif ln == "":
                 pass
             else:
                 # Create a new row.
                 try:
                     LOGGER.debug(
-                        "Merging the previous row before creating a new one.")
+                        "Merging the previous row before creating a new one."
+                    )
                     self._table_rows[-1].merge_rows()
                 except IndexError:
                     LOGGER.debug("No previous row found.")
@@ -170,13 +172,13 @@ class Columns:
     def _get_col_widths_and_table_class(self, line):
         m = RE.match(line)
         line = m.group(1)
-        line = line.replace('%', '')
+        line = line.replace("%", "")
         self.widths = line.split()
         _cls = (m.group(2)).strip()
         if _cls == "":
             pass
         else:
-            self._table_class = m.group(2)
+            self._table_class = "{} {}".format(self._table_class, m.group(2))
             self._get_cell_width_template()
 
     def _get_cell_width_template(self):
@@ -190,11 +192,11 @@ class CssColumns(BlockProcessor):
 
     def __init__(self, parser, config):
         BlockProcessor.__init__(self, parser)
-        self.row_class = config['row_class']
+        self.row_class = config["row_class"]
         Columns.noflow_cell_width_template = config[
-            CONFIG_CELL_NOFLOW_WIDTH_CLASS_TEMPLATE]
-        Columns.cell_width_template = config[
-            CONFIG_CELL_WIDTH_CLASS_TEMPLATE]
+            CONFIG_CELL_NOFLOW_WIDTH_CLASS_TEMPLATE
+        ]
+        Columns.cell_width_template = config[CONFIG_CELL_WIDTH_CLASS_TEMPLATE]
 
     def test(self, parent, block):
         """Checks whether a block is found which fits the regex expression"""
@@ -211,7 +213,7 @@ class CssColumns(BlockProcessor):
         try:
             columns.run()
             self.process_rows(parent, columns)
-            parent.set('class', columns.table_class)
+            parent.set("class", columns.table_class)
         except Exception as err:
             LOGGER.exception(err)
             _text = textwrap.dedent(
@@ -221,52 +223,56 @@ class CssColumns(BlockProcessor):
                     {}
                     <div>**END PROBLEM PARSING COLUMN LAYOUT**</div>
                 </div>
-                """).format(
-                    raw_block)
+                """
+            ).format(raw_block)
             parent.text = _text
         finally:
             end = timer()
-            LOGGER.info("finished processing markdown column in {} seconds".format(end-start))
+            LOGGER.info(
+                "finished processing markdown column in {} seconds".format(
+                    end - start
+                )
+            )
 
     def process_rows(self, parent, columns: Columns):
         for _row in columns.table_rows:
             fl = etree.SubElement(parent, "div")
             _css_class = self.row_class
             if _row.css is not None:
-                _css_class = ' '.join((_css_class, _row.css))
-            fl.set('class', _css_class)
-            for cell, width in zip(_row.merged_rows,
-                                   _row.widths):
+                _css_class = " ".join((_css_class, _row.css))
+            fl.set("class", _css_class)
+            for cell, width in zip(_row.merged_rows, _row.widths):
                 self.create_cell_div(
-                    fl, list(cell), width, columns.cell_width_template)
+                    fl, list(cell), width, columns.cell_width_template
+                )
 
     def create_cell_div(self, parent, content, width, width_template):
         cell = etree.SubElement(parent, "div")
-        cell.set('class', width_template.format(width))
+        cell.set("class", width_template.format(width))
         self.parser.parseBlocks(cell, content)
 
 
 class CssColumnsExtension(Extension):
     def __init__(self, *args, **kwargs):
         self.config = {
-            'row_class':
-                ['row', 'the class name of the container'],
-            CONFIG_CELL_WIDTH_CLASS_TEMPLATE:
-                [DEFAULT_CELL_WIDTH_CLASS_TEMPLATE,
-                 'the template to set the cell width'],
-            CONFIG_CELL_NOFLOW_WIDTH_CLASS_TEMPLATE:
-                [NOFLOW_CELL_WIDTH_CLASS_TEMPLATE,
-                 'Cell width when "noflow" class is added to the table class.']
+            "row_class": ["row", "the class name of the container"],
+            CONFIG_CELL_WIDTH_CLASS_TEMPLATE: [
+                DEFAULT_CELL_WIDTH_CLASS_TEMPLATE,
+                "the template to set the cell width",
+            ],
+            CONFIG_CELL_NOFLOW_WIDTH_CLASS_TEMPLATE: [
+                NOFLOW_CELL_WIDTH_CLASS_TEMPLATE,
+                'Cell width when "noflow" class is added to the table class.',
+            ],
         }
 
         super(CssColumnsExtension, self).__init__(*args, **kwargs)
 
     def extendMarkdown(self, md, md_globals):
         """ Add an instance of DefListProcessor to BlockParser. """
-        md.parser.blockprocessors.add('defflexcolumn',
-                                      CssColumns(md.parser,
-                                                 self.getConfigs()),
-                                      '_begin')
+        md.parser.blockprocessors.add(
+            "defflexcolumn", CssColumns(md.parser, self.getConfigs()), "_begin"
+        )
 
 
 def makeExtension(*args, **kwargs):

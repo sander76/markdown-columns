@@ -1,6 +1,6 @@
 
 
-output2 = """<div class="another">
+output2 = """<div class="_column_container instruction another">
 <div class="row">
 <div class="col-sm-1">
 <p>test</p>
@@ -14,7 +14,7 @@ output2 = """<div class="another">
 </div>
 </div>"""
 
-output3 = """<div class="instruction">
+output3 = """<div class="_column_container instruction">
 <div class="row">
 <div class="col-sm-1">
 <p>cell 1</p>
@@ -74,7 +74,7 @@ input7 = """%% %1 %2 %10
 | += row1 attached |      |         |"""
 
 
-output7 = """<div class="instruction">
+output7 = """<div class="_column_container instruction">
 <div class="row">
 <div class="col-sm-1">
 <p>cell 1</p>
@@ -90,7 +90,7 @@ output7 = """<div class="instruction">
 </div>"""
 
 
-doc_output = """<div class="instruction">
+doc_output = """<div class="_column_container instruction">
 <div class="row">
 <div class="col-sm-7">
 <p>This instruction will make use of the following buttons on the Remote:</p>
@@ -161,7 +161,7 @@ doc_output = """<div class="instruction">
 </div>
 </div>"""
 
-output8 = """<div class="instruction">
+output8 = """<div class="_column_container instruction">
 <div class="row2">
 <div class="col-1 cell">
 <p>test</p>
@@ -175,7 +175,7 @@ output8 = """<div class="instruction">
 </div>
 </div>"""
 
-attribute_output1 = """<div class="another">
+attribute_output1 = """<div class="_column_container instruction another">
 <div class="row">
 <div class="col-sm-1">
 <p class="test">test1</p>
