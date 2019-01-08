@@ -116,7 +116,7 @@ class Columns:
         # temporary storage of column widths which are processed during the
         # lines interpretation.
         self.widths = None
-        self._table_class = "_column_container instruction"
+        self._table_class = "_column_container"
         self._table_rows = []
         # self.cell_width_template = CONFIG_CELL_WIDTH_CLASS_TEMPLATE
         # self.cell_width_template = cell_width_template
@@ -228,10 +228,9 @@ class CssColumns(BlockProcessor):
             parent.text = _text
         finally:
             end = timer()
-            LOGGER.info(
-                "finished processing markdown column in {} seconds".format(
-                    end - start
-                )
+            LOGGER.debug(
+                "finished processing markdown column in %s seconds",
+                end - start,
             )
 
     def process_rows(self, parent, columns: Columns):

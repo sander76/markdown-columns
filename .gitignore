@@ -4,4 +4,6 @@ dist
 build
 .cache
 markdown_columns.egg-info
+venv
+.pytest_cache
 

@@ -48,7 +48,7 @@ class UploadCommand(Command):
 
 setup(
     name="markdown-columns",
-    version="1.0.0",
+    version="1.0.2",
     packages=["md_columns"],
     url="https://github.com/sander76/markdown-columns",
     license="MIT",

@@ -75,7 +75,7 @@ doc1_output = """<blockquote>
 </div>
 </div>"""
 
-output1 = """<div class="_column_container instruction">
+output1 = """<div class="_column_container">
 <div class="row">
 <div class="col-sm-1">
 <p>test</p>
@@ -186,7 +186,7 @@ input_no_flow1 = """
 | test             | test | testing |
 """
 
-output_no_flow1 = """<div class="_column_container instruction noflow">
+output_no_flow1 = """<div class="_column_container noflow">
 <div class="row">
 <div class="col-xs-1">
 <p>test</p>
