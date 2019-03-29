@@ -56,12 +56,23 @@ output:
 
 ## configuration
 
-Adding the extension.
+For usage inside python markdown:
 
 ```python
 from md_columns import CssColumnsExtension
 
 markdown.Markdown(extensions=[CssColumnsExtension()])
+```
+
+As an extension in MKDOCS:
+
+Make sure the plugin is installed.
+Create a `markdown_extensions` entry in your `mkdocs.yml` file:
+
+```yaml
+markdown_extensions:
+  - md_columns.md_columns
+
 ```
 
 Optional arguments to configure the output:
